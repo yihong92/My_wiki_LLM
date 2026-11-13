@@ -1,0 +1,463 @@
+<meta charset="utf-8">
+<title>MCP 是什麼？</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: 一次一張 16:9 投影片，字級以容器寬度（cqw）縮放，手機上同比例縮小；底部固定導覽列 */
+:root{
+  --bg:#E9EDEF; --slide:#FBFCFC; --ink:#13202A; --muted:#5B6A74; --line:#D5DDE1;
+  --accent:#0E7A6B; --accent-soft:#DDF0EC; --port:#B86E0F; --port-soft:#FAEDD8; --warn:#A33A2B; --warn-soft:#F8E4DF; --code:#EDF1F3;
+  --f-display:"Space Grotesk","Noto Sans TC",system-ui,sans-serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B1116; --slide:#131C24; --ink:#E5ECF0; --muted:#94A3AD; --line:#27343E;
+  --accent:#4CC2AE; --accent-soft:#133630; --port:#E3A04A; --port-soft:#3A2A14; --warn:#F08A79; --warn-soft:#3B1E19; --code:#1B2731; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0B1116; --slide:#131C24; --ink:#E5ECF0; --muted:#94A3AD; --line:#27343E;
+  --accent:#4CC2AE; --accent-soft:#133630; --port:#E3A04A; --port-soft:#3A2A14; --warn:#F08A79; --warn-soft:#3B1E19; --code:#1B2731; color-scheme:dark }
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);display:flex;flex-direction:column}
+.stage-wrap{flex:1;display:grid;place-items:center;padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));min-height:0}
+.stage{--u:1cqw;width:min(100%, calc((100vh - 110px) * 16 / 9));aspect-ratio:16/9;max-width:100%;container-type:inline-size;position:relative}
+@media (max-width:700px){
+  .stage-wrap{place-items:start stretch}
+  .stage{--u:2.25cqw;aspect-ratio:auto;width:100%}
+  .slide{position:relative;inset:auto;min-height:calc(100vh - 120px);padding:22px 18px 16px}
+  .cols{grid-template-columns:1fr!important}
+  .tl{grid-template-columns:1fr 1fr}
+  .tl::before{display:none}
+  pre{white-space:pre-wrap}
+}
+.slide{position:absolute;inset:0;background:var(--slide);border:1px solid var(--line);border-radius:calc(var(--u)*1.2);padding:calc(var(--u)*4.2) calc(var(--u)*5) calc(var(--u)*3.4);display:flex;flex-direction:column;overflow:hidden}
+.slide[hidden]{display:none!important}
+.kicker{font-family:var(--f-mono);font-size:calc(var(--u)*1.15);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);display:flex;gap:calc(var(--u)*1.2);align-items:center}
+.kicker::before{content:"";width:calc(var(--u)*2.2);height:calc(var(--u)*.25);background:var(--accent)}
+h1,h2{font-family:var(--f-display);font-weight:700;margin:calc(var(--u)*1.2) 0 calc(var(--u)*1.8);line-height:1.2;text-wrap:balance}
+h2{font-size:calc(var(--u)*3.6)}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;font-size:calc(var(--u)*1.85);line-height:1.65}
+.body p{margin:0 0 calc(var(--u)*1.2);max-width:62ch}
+.foot{display:flex;justify-content:space-between;align-items:center;font-size:calc(var(--u)*1.05);color:var(--muted);font-family:var(--f-mono);border-top:1px solid var(--line);padding-top:calc(var(--u)*1.2);margin-top:calc(var(--u)*1.4)}
+.foot a{color:var(--muted);text-decoration:none}
+.foot a:hover{color:var(--accent)}
+.foot a::before{content:"Wiki ↗ "}
+.cols{display:grid;grid-template-columns:repeat(var(--n,2),minmax(0,1fr));gap:calc(var(--u)*2.2)}
+.card{border:1px solid var(--line);border-radius:calc(var(--u)*1);padding:calc(var(--u)*1.8) calc(var(--u)*2);background:var(--slide)}
+.card h3{font-family:var(--f-display);font-size:calc(var(--u)*2.1);margin:0 0 calc(var(--u)*.6)}
+.card .en{font-family:var(--f-mono);font-size:calc(var(--u)*1.1);color:var(--muted);letter-spacing:.06em}
+.card p{font-size:calc(var(--u)*1.6);margin:calc(var(--u)*.6) 0 0;line-height:1.55}
+.card.hl{border-color:var(--accent);background:var(--accent-soft)}
+.card.port{border-color:var(--port);background:var(--port-soft)}
+.card.warn{border-color:var(--warn);background:var(--warn-soft)}
+.big{font-family:var(--f-display);font-size:calc(var(--u)*6);line-height:1;font-weight:700;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+code,pre{font-family:var(--f-mono)}
+pre{background:var(--code);border-radius:calc(var(--u)*1);padding:calc(var(--u)*1.6) calc(var(--u)*2);font-size:calc(var(--u)*1.35);line-height:1.55;margin:0;overflow:hidden;white-space:pre}
+.k{color:var(--accent)} .s{color:var(--port)}
+svg text{font-family:var(--f-body)}
+.t-ink{fill:var(--ink)} .t-muted{fill:var(--muted)} .t-acc{fill:var(--accent)} .t-port{fill:var(--port)}
+.st-line{stroke:var(--line)} .st-muted{stroke:var(--muted)} .st-acc{stroke:var(--accent)} .st-port{stroke:var(--port)} .st-warn{stroke:var(--warn)}
+.f-slide{fill:var(--slide)} .f-acc{fill:var(--accent-soft)} .f-port{fill:var(--port-soft)} .f-code{fill:var(--code)}
+/* cover */
+.cover{background:var(--slide);justify-content:space-between}
+.cover h1{font-size:calc(var(--u)*7.4);margin:0;letter-spacing:-.01em}
+.cover h1 em{font-style:normal;color:var(--accent)}
+.cover .sub{font-size:calc(var(--u)*2.3);color:var(--muted);max-width:40ch;line-height:1.5;margin-top:calc(var(--u)*1.6)}
+.socket{display:flex;gap:calc(var(--u)*1.2);align-items:center;font-family:var(--f-mono);font-size:calc(var(--u)*1.2);color:var(--muted)}
+.socket i{display:inline-block;width:calc(var(--u)*3.2);height:calc(var(--u)*1.6);border:calc(var(--u)*.3) solid var(--accent);border-radius:calc(var(--u)*.8);position:relative}
+.socket i::after{content:"";position:absolute;left:25%;right:25%;top:40%;height:calc(var(--u)*.25);background:var(--accent);border-radius:calc(var(--u)*1)}
+/* timeline */
+.tl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(var(--u)*1.6);position:relative;margin-top:calc(var(--u)*1)}
+.tl::before{content:"";position:absolute;left:0;right:0;top:calc(var(--u)*1.1);height:calc(var(--u)*.25);background:var(--line)}
+.tl div{position:relative;padding-top:calc(var(--u)*3.4);font-size:calc(var(--u)*1.55);line-height:1.5}
+.tl div::before{content:"";position:absolute;top:calc(var(--u)*.35);left:0;width:calc(var(--u)*1.8);height:calc(var(--u)*1.8);border-radius:50%;background:var(--slide);border:calc(var(--u)*.35) solid var(--accent)}
+.tl b{display:block;font-family:var(--f-mono);font-size:calc(var(--u)*1.4);color:var(--accent);margin-bottom:calc(var(--u)*.4)}
+/* quiz */
+.q{border:1px solid var(--line);border-radius:calc(var(--u)*1);padding:calc(var(--u)*1.3) calc(var(--u)*1.8);font-size:calc(var(--u)*1.6)}
+.q button{font:inherit;font-size:calc(var(--u)*1.3);margin-top:calc(var(--u)*.8);background:var(--code);color:var(--ink);border:1px solid var(--line);border-radius:calc(var(--u)*.6);padding:calc(var(--u)*.4) calc(var(--u)*1.2);cursor:pointer}
+.q .ans{margin-top:calc(var(--u)*.6);color:var(--accent)}
+ul.tight{margin:0;padding-left:calc(var(--u)*2.4)}
+ul.tight li{margin-bottom:calc(var(--u)*.6)}
+/* nav */
+.bar{display:flex;align-items:center;justify-content:center;gap:12px;padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-family:var(--f-mono);font-size:13px;color:var(--muted);flex-wrap:wrap}
+.bar button{font:inherit;background:var(--slide);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 14px;cursor:pointer}
+.bar button:hover{border-color:var(--accent)}
+.bar button:disabled{opacity:.4;cursor:default}
+button:focus-visible,a:focus-visible{outline:2px solid var(--port);outline-offset:2px}
+.prog{width:120px;height:4px;background:var(--line);border-radius:4px;overflow:hidden}
+.prog span{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+@media (prefers-reduced-motion: reduce){.prog span{transition:none}}
+.hint{font-size:12px}
+@media (max-width:600px){.hint{display:none}}
+</style>
+
+<div class="stage-wrap">
+<div class="stage" id="stage">
+
+<!-- 1 -->
+<section class="slide cover" data-wiki="home">
+  <div class="kicker">教學簡報 · 給第一次聽到 MCP 的人</div>
+  <div>
+    <h1>MCP 是什麼？<br><em>給 AI 一個通用插座</em></h1>
+    <div class="sub">Model Context Protocol（模型上下文協定）入門：它解決什麼問題、怎麼運作、使用時要注意什麼。</div>
+  </div>
+  <div class="foot" style="border:0"><span class="socket"><i></i>約 15 分鐘 · 16 張</span><a href="https://claude.ai/artifact/Fc4AYaGGTZWHubbLAxHqxM#home">首頁</a></div>
+</section>
+
+<!-- 2 -->
+<section class="slide" hidden data-wiki="problem">
+  <div class="kicker">先想一個問題</div>
+  <h2>AI 很聰明，卻看不到你的資料</h2>
+  <div class="body">
+    <div class="cols">
+      <div class="card"><h3>你問 AI</h3><p>「幫我看一下上週 GitHub 上那個沒修好的 bug，順便在 Slack 跟組員說。」</p></div>
+      <div class="card warn"><h3>AI 卡住了</h3><p>它不在你的 GitHub 裡，也進不了你的 Slack。沒人幫它接線，它只能說「請把內容貼給我」。</p></div>
+    </div>
+    <p style="margin-top:calc(var(--u)*2.4)">模型能力進步得很快，但它們被關在資訊孤島外面；每接一個新資料來源，都得另外寫一套整合程式。</p>
+  </div>
+  <div class="foot"><span>2 / 16</span><a href="https://claude.ai/artifact/Fc4AYaGGTZWHubbLAxHqxM#problem">要解決的問題</a></div>
+</section>
+
+<!-- 3 -->
+<section class="slide" hidden data-wiki="problem">
+  <div class="kicker">沒有標準的時候</div>
+  <h2>每一對都要客製：M × N</h2>
+  <div class="body">
+    <div class="cols" style="--n:2;align-items:center">
+      <svg viewBox="0 0 420 260" role="img" aria-label="三個 AI 應用與四個工具之間兩兩相連，共十二條線">
+        <g stroke-width="1.4" class="st-muted" opacity=".55">
+          <line x1="110" y1="50" x2="310" y2="35"/><line x1="110" y1="50" x2="310" y2="100"/><line x1="110" y1="50" x2="310" y2="165"/><line x1="110" y1="50" x2="310" y2="230"/>
+          <line x1="110" y1="130" x2="310" y2="35"/><line x1="110" y1="130" x2="310" y2="100"/><line x1="110" y1="130" x2="310" y2="165"/><line x1="110" y1="130" x2="310" y2="230"/>
+          <line x1="110" y1="210" x2="310" y2="35"/><line x1="110" y1="210" x2="310" y2="100"/><line x1="110" y1="210" x2="310" y2="165"/><line x1="110" y1="210" x2="310" y2="230"/>
+        </g>
+        <g class="f-acc st-acc" stroke-width="1.5">
+          <rect x="10" y="32" width="100" height="36" rx="7"/><rect x="10" y="112" width="100" height="36" rx="7"/><rect x="10" y="192" width="100" height="36" rx="7"/>
+        </g>
+        <g class="f-port st-port" stroke-width="1.5">
+          <rect x="310" y="20" width="100" height="30" rx="7"/><rect x="310" y="85" width="100" height="30" rx="7"/><rect x="310" y="150" width="100" height="30" rx="7"/><rect x="310" y="215" width="100" height="30" rx="7"/>
+        </g>
+        <g font-size="14" text-anchor="middle" class="t-ink">
+          <text x="60" y="55">聊天 App</text><text x="60" y="135">程式編輯器</text><text x="60" y="215">客服系統</text>
+          <text x="360" y="40">GitHub</text><text x="360" y="105">Slack</text><text x="360" y="170">資料庫</text><text x="360" y="235">Google Drive</text>
+        </g>
+      </svg>
+      <div>
+        <div class="big">3 × 4 = 12</div>
+        <p class="muted" style="margin-top:calc(var(--u)*1)">3 個應用、4 個工具，就要寫 12 套整合。10 個應用、20 個工具，就是 200 套。</p>
+        <p>而且各家模型的工具格式都不一樣，換一家就要再改一次。</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>3 / 16</span><a href="https://claude.ai/artifact/Fc4AYaGGTZWHubbLAxHqxM#problem">要解決的問題：M×N</a></div>
+</section>
+
+<!-- 4 -->
+<section class="slide" hidden data-wiki="what-is">
+  <div class="kicker">MCP 的解法</div>
+  <h2>大家都接同一種插座：M + N</h2>
+  <div class="body">
+    <div class="cols" style="align-items:center">
+      <svg viewBox="0 0 420 260" role="img" aria-label="三個 AI 應用與四個工具都只連到中間的 MCP，共七條線">
+        <g stroke-width="1.8" class="st-acc">
+          <line x1="110" y1="50" x2="185" y2="130"/><line x1="110" y1="130" x2="185" y2="130"/><line x1="110" y1="210" x2="185" y2="130"/>
+        </g>
+        <g stroke-width="1.8" class="st-port">
+          <line x1="235" y1="130" x2="310" y2="35"/><line x1="235" y1="130" x2="310" y2="100"/><line x1="235" y1="130" x2="310" y2="165"/><line x1="235" y1="130" x2="310" y2="230"/>
+        </g>
+        <rect x="175" y="100" width="70" height="60" rx="12" class="f-slide st-acc" stroke-width="2.5"/>
+        <text x="210" y="136" text-anchor="middle" font-size="17" font-weight="700" class="t-acc">MCP</text>
+        <g class="f-acc st-acc" stroke-width="1.5">
+          <rect x="10" y="32" width="100" height="36" rx="7"/><rect x="10" y="112" width="100" height="36" rx="7"/><rect x="10" y="192" width="100" height="36" rx="7"/>
+        </g>
+        <g class="f-port st-port" stroke-width="1.5">
+          <rect x="310" y="20" width="100" height="30" rx="7"/><rect x="310" y="85" width="100" height="30" rx="7"/><rect x="310" y="150" width="100" height="30" rx="7"/><rect x="310" y="215" width="100" height="30" rx="7"/>
+        </g>
+        <g font-size="14" text-anchor="middle" class="t-ink">
+          <text x="60" y="55">聊天 App</text><text x="60" y="135">程式編輯器</text><text x="60" y="215">客服系統</text>
+          <text x="360" y="40">GitHub</text><text x="360" y="105">Slack</text><text x="360" y="170">資料庫</text><text x="360" y="235">Google Drive</text>
+        </g>
+      </svg>
+      <div>
+        <div class="big">3 + 4 = 7</div>
+        <p style="margin-top:calc(var(--u)*1)">每個工具寫一次 <b>MCP Server</b>，每個應用做一次 <b>MCP Client</b>，彼此就能互通。</p>
+        <p class="muted">就像 USB-C：以前每台裝置一種接頭，現在一種接頭接全部。</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>4 / 16</span><a href="https://claude.ai/artifact/Fc4AYaGGTZWHubbLAxHqxM#what-is">MCP 是什麼</a></div>
+</section>
+
+<!-- 5 -->
+<section class="slide" hidden data-wiki="what-is">
+  <div class="kicker">一句話定義</div>
+  <h2>MCP 是一個開放標準，<br>規定 AI 應用怎麼接外部資料與工具</h2>
+  <div class="body">
+    <div class="cols" style="--n:3">
+      <div class="card"><div class="en">MODEL</div><h3>模型</h3><p>會讀寫文字的 AI，例如 Claude。</p></div>
+      <div class="card"><div class="en">CONTEXT</div><h3>上下文</h3><p>模型回答時能參考的資訊：檔案、資料庫、工具清單。</p></div>
+      <div class="card"><div class="en">PROTOCOL</div><h3>協定</h3><p>雙方約好的溝通規則，像 HTTP 之於網頁。</p></div>
+    </div>
+    <p style="margin-top:calc(var(--u)*2.4)">由 Anthropic 在 2024 年 11 月開源。它<b>只負責交換上下文</b>，不會讓模型變聰明，也不規定應用怎麼使用模型。</p>
+  </div>
+  <div class="foot"><span>5 / 16</span><a href="https://claude.ai/artifact/Fc4AYaGGTZWHubbLAxHqxM#what-is">MCP 是什麼</a></div>
+</section>
+
+<!-- 6 -->
+<section class="slide" hidden data-wiki="architecture">
+  <div class="kicker">怎麼運作 ①</div>
+  <h2>三個角色：Host、Client、Server</h2>
+  <div class="body">
+    <div class="cols" style="align-items:center;grid-template-columns:1.15fr 1fr">
+      <svg viewBox="0 0 440 250" role="img" aria-label="VS Code 作為 Host，內含兩個 Client，分別連到本機檔案系統 Server 與遠端 Sentry Server">
+        <rect x="10" y="20" width="190" height="210" rx="12" class="f-acc st-acc" stroke-width="1.8"/>
+        <text x="105" y="48" text-anchor="middle" font-size="15" font-weight="700" class="t-acc">Host：VS Code</text>
+        <rect x="35" y="75" width="140" height="44" rx="8" class="f-slide st-acc" stroke-width="1.5"/>
+        <rect x="35" y="150" width="140" height="44" rx="8" class="f-slide st-acc" stroke-width="1.5"/>
+        <text x="105" y="102" text-anchor="middle" font-size="14" class="t-ink">Client 1</text>
+        <text x="105" y="177" text-anchor="middle" font-size="14" class="t-ink">Client 2</text>
+        <line x1="175" y1="97" x2="270" y2="97" class="st-port" stroke-width="2"/>
+        <line x1="175" y1="172" x2="270" y2="172" class="st-port" stroke-width="2" stroke-dasharray="6 5"/>
+        <text x="222" y="88" text-anchor="middle" font-size="11" class="t-muted">一對一</text>
+        <text x="222" y="163" text-anchor="middle" font-size="11" class="t-muted">一對一</text>
+        <rect x="270" y="72" width="160" height="50" rx="8" class="f-port st-port" stroke-width="1.5"/>
+        <rect x="270" y="147" width="160" height="50" rx="8" class="f-port st-port" stroke-width="1.5"/>
+        <text x="350" y="94" text-anchor="middle" font-size="13" class="t-ink">檔案系統 Server</text>
+        <text x="350" y="112" text-anchor="middle" font-size="11" class="t-muted">在你的電腦上</text>
+        <text x="350" y="169" text-anchor="middle" font-size="13" class="t-ink">Sentry Server</text>
+        <text x="350" y="187" text-anchor="middle" font-size="11" class="t-muted">在網路另一端</text>
+      </svg>
+      <ul class="tight">
+        <li><b>Host</b>：你在用的 AI 應用（Claude Desktop、VS Code）。</li>
+        <li><b>Client</b>：Host 裡的連線員，<b>一個 Client 只連一個 Server</b>。</li>
+        <li><b>Server</b>：提供資料或工具的程式，可以在本機，也可以在遠端。</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>6 / 16</span><a href="https://claude.ai/artifact/Fc4AYaGGTZWHubbLAxHqxM#architecture">架構</a></div>
+</section>
+
+<!-- 7 -->
+<section class="slide" hidden data-wiki="primitives">
+  <div class="kicker">怎麼運作 ②</div>
+  <h2>Server 能提供三種東西</h2>
+  <div class="body">
+    <div class="cols" style="--n:3">
+      <div class="card hl"><div class="en">TOOLS</div><h3>工具：去做事</h3><p>可執行的函式，例如查資料庫、呼叫 API。</p></div>
+      <div class="card"><div class="en">RESOURCES</div><h3>資源：拿來讀</h3><p>提供背景資料，例如檔案內容、資料表結構。</p></div>
+      <div class="card"><div class="en">PROMPTS</div><h3>提示範本</h3><p>可重複使用的互動範本，例如示範怎麼用工具的例子。</p></div>
+    </div>
+    <p style="margin-top:calc(var(--u)*2.4)">例：一個<b>資料庫 Server</b> 可以同時給「查詢工具」＋「資料表結構資源」＋「查詢範例範本」。<br><span class="muted">每一種都能先用 <code>list</code> 問「你有哪些？」，所以清單可以隨時變動。</span></p>
+  </div>
+  <div class="foot"><span>7 / 16</span><a href="https://claude.ai/artifact/Fc4AYaGGTZWHubbLAxHqxM#primitives">原語</a></div>
+</section>
+
+<!-- 8 -->
+<section class="slide" hidden data-wiki="primitives">
+  <div class="kicker">怎麼運作 ③</div>
+  <h2>反過來，Server 也能請 Client 幫忙</h2>
+  <div class="body">
+    <div class="cols" style="--n:3">
+      <div class="card"><div class="en">SAMPLING</div><h3>借用模型</h3><p>Server 請 Host 的模型產生文字，自己不用綁定任何一家模型。</p></div>
+      <div class="card"><div class="en">ELICITATION</div><h3>問使用者</h3><p>Server 請使用者補充資訊，或確認某個動作要不要做。</p></div>
+      <div class="card"><div class="en">LOGGING</div><h3>回報紀錄</h3><p>Server 把日誌傳回 Client，方便除錯。</p></div>
+    </div>
+    <p style="margin-top:calc(var(--u)*2.4)">重點：MCP 是<b>雙向</b>的。工具、資料、範本放在同一個介面後面，這是它和「單純呼叫函式」最大的差別。</p>
+  </div>
+  <div class="foot"><span>8 / 16</span><a href="https://claude.ai/artifact/Fc4AYaGGTZWHubbLAxHqxM#primitives">原語（Client 端）</a></div>
+</section>
+
+<!-- 9 -->
+<section class="slide" hidden data-wiki="messages">
+  <div class="kicker">怎麼運作 ④</div>
+  <h2>一次工具呼叫實際長這樣</h2>
+  <div class="body">
+    <div class="cols" style="grid-template-columns:1fr 1.25fr;align-items:center">
+      <ol style="margin:0;padding-left:calc(var(--u)*2.4);font-size:calc(var(--u)*1.7)">
+        <li style="margin-bottom:calc(var(--u)*1)"><b>問清單</b>：Client 送 <code>tools/list</code>，Server 回傳工具名稱、說明、參數格式。</li>
+        <li style="margin-bottom:calc(var(--u)*1)"><b>模型決定</b>：使用者問天氣，模型選了 <code>weather_current</code>。</li>
+        <li style="margin-bottom:calc(var(--u)*1)"><b>呼叫</b>：Host 把請求轉給對的 Server。</li>
+        <li><b>拿結果</b>：結果放回對話，模型再用它回答。</li>
+      </ol>
+<pre>{
+  <span class="k">"jsonrpc"</span>: <span class="s">"2.0"</span>, <span class="k">"id"</span>: 3,
+  <span class="k">"method"</span>: <span class="s">"tools/call"</span>,
+  <span class="k">"params"</span>: {
+    <span class="k">"name"</span>: <span class="s">"weather_current"</span>,
+    <span class="k">"arguments"</span>: {
+      <span class="k">"location"</span>: <span class="s">"San Francisco"</span>
+    }
+  }
+}</pre>
+    </div>
+    <p class="muted" style="margin-top:calc(var(--u)*1.8);font-size:calc(var(--u)*1.45)">訊息格式是 JSON-RPC 2.0：有 id 的是請求、要回覆；沒有 id 的是通知，例如「我的工具清單變了」。</p>
+  </div>
+  <div class="foot"><span>9 / 16</span><a href="https://claude.ai/artifact/Fc4AYaGGTZWHubbLAxHqxM#messages">訊息流程</a></div>
+</section>
+
+<!-- 10 -->
+<section class="slide" hidden data-wiki="transport">
+  <div class="kicker">怎麼運作 ⑤</div>
+  <h2>訊息走哪條路：本機或遠端</h2>
+  <div class="body">
+    <div class="cols">
+      <div class="card hl"><div class="en">STDIO · 本機</div><h3>同一台電腦</h3><p>Host 直接啟動 Server 程式，用標準輸入／輸出傳訊息。<br>例：讀你電腦裡的檔案。</p></div>
+      <div class="card port"><div class="en">STREAMABLE HTTP · 遠端</div><h3>透過網路</h3><p>用 HTTP POST 傳訊息，一台 Server 可服務很多人。建議用 OAuth 做授權。<br>例：Sentry 官方 Server。</p></div>
+    </div>
+    <p style="margin-top:calc(var(--u)*2.4)">兩條路送的是<b>同一種 JSON-RPC 訊息</b>，所以寫 Server 的人不用為了換傳輸方式重寫邏輯。</p>
+  </div>
+  <div class="foot"><span>10 / 16</span><a href="https://claude.ai/artifact/Fc4AYaGGTZWHubbLAxHqxM#transport">傳輸層</a></div>
+</section>
+
+<!-- 11 -->
+<section class="slide" hidden data-wiki="vs-function-calling">
+  <div class="kicker">常見混淆</div>
+  <h2>MCP 會取代 Function Calling 嗎？不會</h2>
+  <div class="body">
+    <div class="cols">
+      <div class="card"><div class="en">FUNCTION CALLING</div><h3>模型怎麼按按鈕</h3><p>模型挑選工具、填好參數。各家模型格式不同，通常綁在一個應用裡。</p></div>
+      <div class="card hl"><div class="en">MCP</div><h3>按鈕的插頭長怎樣</h3><p>規定應用怎麼找到、連上外部工具。底層仍然靠 function calling 執行。</p></div>
+    </div>
+    <p style="margin-top:calc(var(--u)*2.4)">只有一個應用、兩三個內部工具？直接用 function calling 就夠了。<br>要讓<b>很多應用共用同一組工具</b>時，才是 MCP 發揮的地方。</p>
+  </div>
+  <div class="foot"><span>11 / 16</span><a href="https://claude.ai/artifact/Fc4AYaGGTZWHubbLAxHqxM#vs-function-calling">MCP 與 Function Calling</a></div>
+</section>
+
+<!-- 12 -->
+<section class="slide" hidden data-wiki="history">
+  <div class="kicker">發展歷程</div>
+  <h2>兩年內，從一家公司的提案變成產業標準</h2>
+  <div class="body">
+    <div class="tl">
+      <div><b>2024-11</b>Anthropic 開源 MCP，附 TypeScript／Python SDK 和 GitHub、Slack 等現成 Server。</div>
+      <div><b>2024–2025</b>Zed、Replit、Sourcegraph 等開發工具陸續支援；之後加入遠端 Server。</div>
+      <div><b>2025-12</b>捐給 Linux 基金會的 Agentic AI Foundation，由社群中立治理。</div>
+      <div><b>2026-07</b>新規格改為「無狀態」：不用先握手，每個請求自帶版本資訊。</div>
+    </div>
+    <p style="margin-top:calc(var(--u)*2.8);font-size:calc(var(--u)*1.55)" class="muted">官方在 2026 年 7 月表示，主要 SDK 每月下載量接近 5 億次。注意：網路上很多 2025 年的教學還在講「先 initialize 握手」，那是舊版規格。</p>
+  </div>
+  <div class="foot"><span>12 / 16</span><a href="https://claude.ai/artifact/Fc4AYaGGTZWHubbLAxHqxM#history">發展歷程</a></div>
+</section>
+
+<!-- 13 -->
+<section class="slide" hidden data-wiki="security">
+  <div class="kicker">使用前必知</div>
+  <h2>能做事的 AI，被騙的代價也更大</h2>
+  <div class="body">
+    <div class="cols" style="--n:3">
+      <div class="card warn"><h3>間接提示注入</h3><p>工具讀回的網頁、郵件裡藏指令，模型照著做。</p></div>
+      <div class="card warn"><h3>工具投毒</h3><p>惡意指令藏在工具的描述文字裡，模型本來就信任它。</p></div>
+      <div class="card warn"><h3>中途變臉</h3><p>Server 先正常，取得信任後更新成惡意版本。</p></div>
+    </div>
+    <p style="margin-top:calc(var(--u)*2.2)"><b>三個好習慣：</b>工具讀到的內容一律當成不可信 · 寫入、寄信、付款、刪除前要人工確認 · 只裝審查過的 Server 並固定版本。</p>
+  </div>
+  <div class="foot"><span>13 / 16</span><a href="https://claude.ai/artifact/Fc4AYaGGTZWHubbLAxHqxM#security">安全風險與防護</a></div>
+</section>
+
+<!-- 14 -->
+<section class="slide" hidden data-wiki="vs-function-calling">
+  <div class="kicker">實務判斷</div>
+  <h2>什麼時候該用 MCP？</h2>
+  <div class="body">
+    <div class="cols">
+      <div class="card hl"><h3>適合用 MCP</h3>
+        <ul class="tight" style="font-size:calc(var(--u)*1.6);margin-top:calc(var(--u)*.8)"><li>同一組工具要給好幾個 AI 應用用</li><li>想直接用別人寫好的 Server（GitHub、Slack…）</li><li>不想被綁在某一家模型廠商</li></ul></div>
+      <div class="card"><h3>可以先不用</h3>
+        <ul class="tight" style="font-size:calc(var(--u)*1.6);margin-top:calc(var(--u)*.8)"><li>只有一個應用、一個模型、少數工具</li><li>兩端程式都由你自己控制</li><li>之後要共用時，再把函式包成 Server 即可</li></ul></div>
+    </div>
+  </div>
+  <div class="foot"><span>14 / 16</span><a href="https://claude.ai/artifact/Fc4AYaGGTZWHubbLAxHqxM#vs-function-calling">MCP 與 Function Calling</a></div>
+</section>
+
+<!-- 15 -->
+<section class="slide" hidden data-wiki="glossary">
+  <div class="kicker">小測驗</div>
+  <h2>檢查一下你懂了沒</h2>
+  <div class="body" style="gap:calc(var(--u)*1.2)">
+    <div class="q">1. VS Code 同時連了 3 個 MCP Server，它裡面有幾個 MCP Client？
+      <div><button type="button" data-ans="a1">看答案</button></div><div class="ans" id="a1" hidden>3 個。一個 Client 只對應一個 Server。</div></div>
+    <div class="q">2. 想讓 AI 讀取資料表結構，比較適合用哪一種原語？
+      <div><button type="button" data-ans="a2">看答案</button></div><div class="ans" id="a2" hidden>Resources。它是拿來讀的背景資料；要執行查詢才用 Tools。</div></div>
+    <div class="q">3. 有了 MCP，是不是就不需要 function calling？
+      <div><button type="button" data-ans="a3">看答案</button></div><div class="ans" id="a3" hidden>不是。MCP 底層還是靠 function calling 讓模型選工具；MCP 負責統一「怎麼接」。</div></div>
+  </div>
+  <div class="foot"><span>15 / 16</span><a href="https://claude.ai/artifact/Fc4AYaGGTZWHubbLAxHqxM#glossary">名詞表</a></div>
+</section>
+
+<!-- 16 -->
+<section class="slide" hidden data-wiki="sources">
+  <div class="kicker">重點回顧</div>
+  <h2>帶走這五句話</h2>
+  <div class="body">
+    <ol style="margin:0;padding-left:calc(var(--u)*2.6);font-size:calc(var(--u)*1.85)">
+      <li>MCP 是連接 AI 應用與外部資料、工具的<b>開放標準</b>。</li>
+      <li>它把 M×N 套客製整合變成 <b>M+N</b>。</li>
+      <li>角色：<b>Host</b> 裡有多個 <b>Client</b>，每個 Client 連一個 <b>Server</b>。</li>
+      <li>Server 提供 <b>Tools／Resources／Prompts</b>；訊息走本機 stdio 或遠端 HTTP。</li>
+      <li>它不取代 function calling，而且<b>安全要靠使用方式</b>。</li>
+    </ol>
+    <p class="muted" style="margin-top:calc(var(--u)*2);font-size:calc(var(--u)*1.4)">本簡報內容全部取自「MCP 學習 Wiki」，每張投影片右下角都連到對應的 Wiki 頁；原始出處見 Wiki 的來源清單（8 份）。</p>
+  </div>
+  <div class="foot"><span>16 / 16</span><a href="https://claude.ai/artifact/Fc4AYaGGTZWHubbLAxHqxM#sources">來源清單</a></div>
+</section>
+
+</div>
+</div>
+
+<div class="bar">
+  <button type="button" id="prev" aria-label="上一張">← 上一張</button>
+  <span id="count">1 / 16</span>
+  <div class="prog" aria-hidden="true"><span id="progBar"></span></div>
+  <button type="button" id="next" aria-label="下一張">下一張 →</button>
+  <span class="hint">鍵盤 ← → 也可以翻頁</span>
+</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var n = slides.length, i = 0;
+  var prev = document.getElementById('prev'), next = document.getElementById('next');
+  var count = document.getElementById('count'), bar = document.getElementById('progBar');
+  function fromHash(){
+    var m = /^#s(\d+)$/.exec(location.hash || '');
+    return m ? Math.min(Math.max(parseInt(m[1],10)-1,0),n-1) : 0;
+  }
+  function render(){
+    slides.forEach(function(s,k){ s.hidden = k !== i; });
+    count.textContent = (i+1) + ' / ' + n;
+    bar.style.width = ((i+1)/n*100) + '%';
+    prev.disabled = i === 0; next.disabled = i === n-1;
+  }
+  function go(k){
+    i = Math.min(Math.max(k,0),n-1);
+    if (location.hash !== '#s'+(i+1)) { try { history.replaceState(null,'','#s'+(i+1)); } catch(e){} }
+    render();
+  }
+  prev.addEventListener('click', function(){ go(i-1); });
+  next.addEventListener('click', function(){ go(i+1); });
+  document.addEventListener('keydown', function(e){
+    if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(i+1); }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(i-1); }
+  });
+  var x0 = null;
+  var stage = document.getElementById('stage');
+  stage.addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; }, {passive:true});
+  stage.addEventListener('touchend', function(e){
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 50) go(i + (dx < 0 ? 1 : -1));
+    x0 = null;
+  });
+  document.querySelectorAll('[data-ans]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var a = document.getElementById(b.getAttribute('data-ans'));
+      a.hidden = !a.hidden; b.textContent = a.hidden ? '看答案' : '收起';
+    });
+  });
+  window.addEventListener('hashchange', function(){ i = fromHash(); render(); });
+  i = fromHash(); render();
+})();
+</script>

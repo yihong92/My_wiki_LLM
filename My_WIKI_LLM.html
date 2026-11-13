@@ -1,0 +1,475 @@
+<meta charset="utf-8">
+<title>MCP 學習 Wiki</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: 左側目錄 + 單欄閱讀頁（hash 路由，每個概念一頁），像一本可互相連結的筆記本 */
+:root{
+  --bg:#F3F5F6; --surface:#FFFFFF; --ink:#14202B; --muted:#5A6873; --line:#D9E0E4;
+  --accent:#0E7A6B; --accent-soft:#E0F1EE; --port:#B86E0F; --port-soft:#FBEFDC; --warn:#A33A2B; --warn-soft:#F9E6E2;
+  --code-bg:#EEF2F4;
+  --f-display:"Space Grotesk","Noto Sans TC",system-ui,sans-serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F161C; --surface:#162029; --ink:#E4EBEF; --muted:#94A3AD; --line:#26333D;
+  --accent:#4CC2AE; --accent-soft:#143530; --port:#E3A04A; --port-soft:#3A2A14; --warn:#F08A79; --warn-soft:#3B1E19;
+  --code-bg:#1C2833; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0F161C; --surface:#162029; --ink:#E4EBEF; --muted:#94A3AD; --line:#26333D;
+  --accent:#4CC2AE; --accent-soft:#143530; --port:#E3A04A; --port-soft:#3A2A14; --warn:#F08A79; --warn-soft:#3B1E19;
+  --code-bg:#1C2833; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.75;margin:0}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--port);outline-offset:2px;border-radius:4px}
+.shell{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:100vh}
+aside{border-right:1px solid var(--line);padding-block:28px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:20px;position:sticky;top:0;height:100vh;overflow:auto;background:var(--surface)}
+.brand{font-family:var(--f-display);font-weight:700;font-size:1.15rem;letter-spacing:.01em;display:flex;align-items:center;gap:10px}
+.plug{width:26px;height:26px;border-radius:6px;background:var(--accent);display:grid;place-items:center;color:var(--surface);font-family:var(--f-mono);font-size:.7rem;font-weight:600}
+.brand-sub{color:var(--muted);font-size:.8rem;margin:4px 0 22px}
+nav h4{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:18px 0 6px;font-weight:500}
+nav a{display:block;padding:5px 10px;border-radius:6px;color:var(--ink);text-decoration:none;font-size:.93rem}
+nav a:hover{background:var(--code-bg)}
+nav a[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:500}
+main{padding-block:40px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+article{max-width:720px;margin:0 auto}
+.crumb{font-family:var(--f-mono);font-size:.75rem;color:var(--muted);letter-spacing:.04em}
+h1{font-family:var(--f-display);font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.25;margin:.3em 0 .5em;text-wrap:balance}
+h2{font-family:var(--f-display);font-size:1.25rem;margin:2em 0 .5em;text-wrap:balance}
+h3{font-size:1.02rem;margin:1.5em 0 .3em}
+p,li{max-width:65ch}
+.lede{font-size:1.08rem;color:var(--muted)}
+.ref{font-family:var(--f-mono);font-size:.72rem;background:var(--code-bg);color:var(--muted);padding:1px 6px;border-radius:4px;text-decoration:none;white-space:nowrap;vertical-align:1px}
+.ref:hover{color:var(--accent)}
+code{font-family:var(--f-mono);font-size:.86em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+pre{font-family:var(--f-mono);font-size:.82rem;background:var(--code-bg);padding:14px 16px;border-radius:8px;overflow-x:auto;line-height:1.55}
+.note{border-left:3px solid var(--port);background:var(--port-soft);padding:10px 14px;border-radius:0 6px 6px 0;margin:1.2em 0}
+.note.warn{border-color:var(--warn);background:var(--warn-soft)}
+.note b{font-weight:700}
+.tbl{overflow-x:auto;margin:1em 0}
+table{border-collapse:collapse;width:100%;font-size:.92rem;min-width:520px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:500;color:var(--muted);font-size:.8rem;letter-spacing:.05em}
+.related{margin-top:2.5em;padding-top:1em;border-top:1px dashed var(--line);font-size:.9rem;color:var(--muted)}
+.related a{margin-right:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:1.2em 0}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:2px}
+.tile:hover{border-color:var(--accent)}
+.tile b{font-family:var(--f-display)}
+.tile span{color:var(--muted);font-size:.85rem;line-height:1.5}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:.5em 0 1.5em}
+.chip{font-family:var(--f-mono);font-size:.72rem;border:1px solid var(--line);border-radius:999px;padding:2px 10px;color:var(--muted)}
+.chip.v{border-color:var(--port);color:var(--port)}
+ol.log{list-style:none;padding:0;margin:0}
+ol.log li{display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+ol.log time{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);padding-top:3px}
+.tag{font-family:var(--f-mono);font-size:.7rem;padding:1px 7px;border-radius:4px;margin-right:6px}
+.tag.ok{background:var(--accent-soft);color:var(--accent)}
+.tag.fix{background:var(--warn-soft);color:var(--warn)}
+.tag.add{background:var(--port-soft);color:var(--port)}
+.menu-btn{display:none}
+@media (max-width:820px){
+  .shell{grid-template-columns:1fr}
+  aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding-right:max(16px,env(safe-area-inset-right,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-block:16px}
+  .menu-btn{display:inline-block;margin-top:10px;font:inherit;font-size:.85rem;background:var(--code-bg);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:4px 12px;cursor:pointer}
+  aside nav{display:none}
+  aside.open nav{display:block}
+  .brand-sub{margin-bottom:0}
+  ol.log li{grid-template-columns:1fr;gap:2px}
+}
+</style>
+
+<div class="shell">
+<aside id="side">
+  <div class="brand"><span class="plug">MCP</span>MCP 學習 Wiki</div>
+  <div class="brand-sub">Model Context Protocol 模型上下文協定 · 共 14 頁 · 8 份來源</div>
+  <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="toc">目錄</button>
+  <nav id="toc">
+    <h4>開始</h4>
+    <a href="#home">首頁與頁面地圖</a>
+    <a href="#what-is">MCP 是什麼</a>
+    <a href="#problem">要解決的問題：M×N</a>
+    <h4>核心概念</h4>
+    <a href="#architecture">架構：Host / Client / Server</a>
+    <a href="#primitives">原語：Tools、Resources、Prompts</a>
+    <a href="#messages">一次互動的訊息流程</a>
+    <a href="#transport">傳輸層：stdio 與 Streamable HTTP</a>
+    <a href="#versions">規格版本與無狀態化</a>
+    <h4>比較與實務</h4>
+    <a href="#vs-function-calling">MCP 與 Function Calling</a>
+    <a href="#security">安全風險與防護</a>
+    <a href="#history">發展歷程與治理</a>
+    <h4>參考</h4>
+    <a href="#glossary">名詞表</a>
+    <a href="#sources">來源清單（Ingest 紀錄）</a>
+    <a href="#log">Wiki 建置日誌</a>
+  </nav>
+</aside>
+
+<main>
+
+<!-- ============ HOME ============ -->
+<article id="p-home" data-title="首頁與頁面地圖">
+  <div class="crumb">WIKI / 首頁</div>
+  <h1>MCP 學習 Wiki</h1>
+  <p class="lede">這是一個以「Model Context Protocol（MCP，模型上下文協定）」為主題的 LLM Wiki。它把 8 份公開資料拆成一個個可互相連結的概念頁，作為後續製作教學簡報時唯一的知識來源。</p>
+  <div class="meta"><span class="chip">讀者：沒接觸過 MCP 的大學生</span><span class="chip">建立日：2026-11-13</span><span class="chip v">以規格 2026-07-28 為準</span></div>
+
+  <h2>建立方式：先討論，後生成</h2>
+  <p>動手寫任何一頁之前，先和使用者確認了三件事：主題選 MCP、資料由 AI 上網蒐集並列出出處、成果做成可連結的網頁版 Wiki。接著才決定頁面清單與每頁的「一句話任務」，再逐份來源 ingest。完整過程記在 <a href="#log">建置日誌</a>。</p>
+
+  <h2>頁面地圖</h2>
+  <div class="grid">
+    <a class="tile" href="#what-is"><b>MCP 是什麼</b><span>一句話定義與 USB-C 比喻</span></a>
+    <a class="tile" href="#problem"><b>M×N 問題</b><span>為什麼需要一個共同標準</span></a>
+    <a class="tile" href="#architecture"><b>架構</b><span>Host、Client、Server 三個角色</span></a>
+    <a class="tile" href="#primitives"><b>原語</b><span>Server 與 Client 各能提供什麼</span></a>
+    <a class="tile" href="#messages"><b>訊息流程</b><span>列出工具、呼叫工具、收到通知</span></a>
+    <a class="tile" href="#transport"><b>傳輸層</b><span>本機 stdio 與遠端 HTTP</span></a>
+    <a class="tile" href="#versions"><b>規格版本</b><span>從握手到無狀態</span></a>
+    <a class="tile" href="#vs-function-calling"><b>vs Function Calling</b><span>兩者是上下層，不是取代</span></a>
+    <a class="tile" href="#security"><b>安全</b><span>提示注入、工具投毒與防護習慣</span></a>
+    <a class="tile" href="#history"><b>發展歷程</b><span>2024 發布到 Linux 基金會</span></a>
+  </div>
+
+  <h2>這份 Wiki 的寫作規則</h2>
+  <ol>
+    <li>每個事實句後面標上來源編號，例如 <a class="ref" href="#sources">S2</a>，點擊可跳到來源清單。</li>
+    <li>日期、版本號、組織名稱至少要有一份官方來源（S1–S4）確認；第三方說法和官方衝突時，以官方為準並寫進日誌。</li>
+    <li>會隨規格版本改變的內容，標上適用版本（如 <span class="chip v">≤ 2025-11-25</span>）。</li>
+    <li>全部用自己的話改寫，不整段照抄來源。</li>
+  </ol>
+</article>
+
+<!-- ============ WHAT IS ============ -->
+<article id="p-what-is" data-title="MCP 是什麼" hidden>
+  <div class="crumb">WIKI / 開始 / MCP 是什麼</div>
+  <h1>MCP 是什麼</h1>
+  <p class="lede">MCP 是一個開放標準，規定 AI 應用程式要用什麼共同格式，去連接外部的資料與工具。</p>
+
+  <h2>一句話定義</h2>
+  <p>Model Context Protocol 是 Anthropic 在 2024 年 11 月開源的協定，用來把 AI 助理接到資料實際存放的地方，例如文件庫、商業軟體和開發環境。<a class="ref" href="#sources">S1</a> 官方文件把它描述為：替大型語言模型（LLM）提供上下文的標準化方式。<a class="ref" href="#sources">S2</a></p>
+
+  <h2>名字拆開來看</h2>
+  <div class="tbl"><table>
+    <tr><th>字</th><th>意思</th></tr>
+    <tr><td>Model</td><td>大型語言模型，例如 Claude、GPT 這類會讀文字、產生文字的 AI。</td></tr>
+    <tr><td>Context</td><td>模型回答時能參考的資訊：檔案內容、資料庫紀錄、工具清單、執行結果等。</td></tr>
+    <tr><td>Protocol</td><td>雙方事先約好的溝通規則，像 HTTP 規定瀏覽器和網站怎麼說話。</td></tr>
+  </table></div>
+
+  <h2>USB-C 比喻</h2>
+  <p>官方與許多教學文章都用 USB-C 來比喻 MCP：以前每種裝置都有自己的接頭，USB-C 讓一種接頭就能接各種周邊；MCP 則讓 AI 應用用同一種「接口」去接各種資料來源與工具。<a class="ref" href="#sources">S6</a></p>
+  <div class="note"><b>比喻的界線：</b>USB-C 不會讓裝置變聰明，它只讓「連接」不再是問題。MCP 同樣不會讓模型更聰明，它只負責交換上下文，不規定應用程式要怎麼使用 LLM。<a class="ref" href="#sources">S2</a></div>
+
+  <h2>MCP 不是什麼</h2>
+  <ul>
+    <li>不是一個模型，也不是某家公司的專屬功能；任何 AI 應用都能實作。<a class="ref" href="#sources">S5</a></li>
+    <li>不是 Function Calling 的替代品，而是建立在它之上的連接標準（見 <a href="#vs-function-calling">比較頁</a>）。</li>
+    <li>不會自動保證安全；安全程度取決於實作與部署方式（見 <a href="#security">安全頁</a>）。</li>
+  </ul>
+  <div class="related">相關頁面：<a href="#problem">M×N 問題</a><a href="#architecture">架構</a><a href="#glossary">名詞表</a></div>
+</article>
+
+<!-- ============ PROBLEM ============ -->
+<article id="p-problem" data-title="要解決的問題：M×N" hidden>
+  <div class="crumb">WIKI / 開始 / 要解決的問題</div>
+  <h1>要解決的問題：M×N</h1>
+  <p class="lede">模型再強，如果拿不到資料，就像被關在房間裡的專家。</p>
+
+  <h2>資料孤島</h2>
+  <p>Anthropic 在發布文中指出：模型的推理能力進步很快，但它們被隔絕在資訊孤島和舊系統之外；每接一個新資料來源，就要寫一套專屬的整合程式，系統很難擴大。<a class="ref" href="#sources">S1</a></p>
+
+  <h2>M×N 變成 M+N</h2>
+  <p>假設有 M 個 AI 應用（聊天機器人、程式編輯器、客服系統……）和 N 個工具（GitHub、Slack、資料庫……）。沒有共同標準時，每一對都要客製連線，最多需要 M×N 套整合。有了 MCP，每個工具只要寫一次 MCP Server，每個應用只要實作一次 MCP Client，總數變成 M+N。<a class="ref" href="#sources">S6</a></p>
+  <div class="tbl"><table>
+    <tr><th>情境</th><th>3 個 AI 應用 × 4 個工具</th><th>10 個應用 × 20 個工具</th></tr>
+    <tr><td>各自客製（M×N）</td><td style="font-variant-numeric:tabular-nums">12 套</td><td style="font-variant-numeric:tabular-nums">200 套</td></tr>
+    <tr><td>透過 MCP（M+N）</td><td style="font-variant-numeric:tabular-nums">7 個實作</td><td style="font-variant-numeric:tabular-nums">30 個實作</td></tr>
+  </table></div>
+  <p>數字是示意用的計算，用來說明成長速度的差異，不是調查數據。</p>
+  <div class="related">相關頁面：<a href="#what-is">MCP 是什麼</a><a href="#architecture">架構</a><a href="#vs-function-calling">vs Function Calling</a></div>
+</article>
+
+<!-- ============ ARCHITECTURE ============ -->
+<article id="p-architecture" data-title="架構" hidden>
+  <div class="crumb">WIKI / 核心概念 / 架構</div>
+  <h1>架構：Host、Client、Server</h1>
+  <p class="lede">MCP 採用主從（client-server）架構，裡面有三個角色。</p>
+
+  <div class="tbl"><table>
+    <tr><th>角色</th><th>是什麼</th><th>例子</th></tr>
+    <tr><td><b>MCP Host</b></td><td>使用者實際操作的 AI 應用程式，負責協調一個或多個 Client。</td><td>Claude Desktop、Claude Code、VS Code</td></tr>
+    <tr><td><b>MCP Client</b></td><td>Host 內部的元件，和「一個」Server 維持專屬連線，替 Host 取得上下文。</td><td>VS Code 連上 Sentry 時建立的連線物件</td></tr>
+    <tr><td><b>MCP Server</b></td><td>提供上下文的程式，可以跑在本機或遠端。</td><td>檔案系統 Server（本機）、Sentry Server（遠端）</td></tr>
+  </table></div>
+  <p>來源：<a class="ref" href="#sources">S2</a></p>
+
+  <h2>一對一的連線</h2>
+  <p>Host 每連一個 Server，就建立一個新的 Client。官方範例：VS Code 連上 Sentry 的 MCP Server 時會建立一個 Client 物件；再連本機檔案系統 Server 時，又建立另一個。<a class="ref" href="#sources">S2</a></p>
+  <pre>VS Code（Host）
+ ├─ Client 1 ──專屬連線── 檔案系統 Server（本機）
+ └─ Client 2 ──專屬連線── Sentry Server（遠端）</pre>
+
+  <h2>兩層結構</h2>
+  <ul>
+    <li><b>資料層（內層）</b>：用 JSON-RPC 2.0 定義訊息格式，包含生命週期管理與各種原語（tools、resources、prompts、通知）。<a class="ref" href="#sources">S2</a></li>
+    <li><b>傳輸層（外層）</b>：定義訊息怎麼送過去，包括建立連線、訊息分框與授權。見 <a href="#transport">傳輸層</a>。<a class="ref" href="#sources">S2</a></li>
+  </ul>
+  <div class="note"><b>初學者提醒：</b>「Server」指提供上下文的程式本身，不一定是遠端機房裡的伺服器。它可以就是你電腦上跑的一個小程式。<a class="ref" href="#sources">S2</a></div>
+  <div class="related">相關頁面：<a href="#primitives">原語</a><a href="#transport">傳輸層</a><a href="#messages">訊息流程</a></div>
+</article>
+
+<!-- ============ PRIMITIVES ============ -->
+<article id="p-primitives" data-title="原語" hidden>
+  <div class="crumb">WIKI / 核心概念 / 原語</div>
+  <h1>原語：Server 和 Client 能互相提供什麼</h1>
+  <p class="lede">「原語」（primitive）是 MCP 最重要的概念：它定義了雙方能交換哪些東西。</p>
+
+  <h2>Server 提供的三種原語</h2>
+  <div class="tbl"><table>
+    <tr><th>原語</th><th>用途</th><th>例子</th><th>主要方法</th></tr>
+    <tr><td><b>Tools 工具</b></td><td>可執行的函式，讓 AI 去「做事」</td><td>查資料庫、呼叫 API、寫檔案</td><td><code>tools/list</code>、<code>tools/call</code></td></tr>
+    <tr><td><b>Resources 資源</b></td><td>提供上下文的資料，讓 AI 去「讀」</td><td>檔案內容、資料表結構、API 回應</td><td><code>resources/list</code>、<code>resources/read</code></td></tr>
+    <tr><td><b>Prompts 提示範本</b></td><td>可重複使用的互動範本</td><td>系統提示、few-shot 範例</td><td><code>prompts/list</code>、<code>prompts/get</code></td></tr>
+  </table></div>
+  <p>每種原語都有 <code>*/list</code> 方法讓 Client 先「探索」有哪些可用，所以清單可以動態變化。<a class="ref" href="#sources">S2</a></p>
+  <h3>綜合例子：資料庫 Server</h3>
+  <p>一個資料庫 MCP Server 可以同時提供：查詢資料的工具、內含資料表結構的資源，以及示範如何使用這些工具的提示範本。<a class="ref" href="#sources">S2</a></p>
+
+  <h2>Client 提供的原語（反方向）</h2>
+  <ul>
+    <li><b>Sampling 取樣</b>：Server 請 Host 的模型幫忙產生文字，Server 自己就不必綁定某家模型。<a class="ref" href="#sources">S2</a></li>
+    <li><b>Elicitation 詢問</b>：Server 請使用者補充資訊或確認某個動作。<a class="ref" href="#sources">S2</a></li>
+    <li><b>Logging 紀錄</b>：Server 把日誌訊息傳給 Client，方便除錯與監控。<a class="ref" href="#sources">S2</a></li>
+  </ul>
+  <div class="note"><b>為什麼重要：</b>Function calling API 只提供工具，RAG 只提供資料，提示庫只提供範本；MCP 把三者放在同一個介面後面，還能在執行時查詢有哪些可用。<a class="ref" href="#sources">S6</a></div>
+  <div class="related">相關頁面：<a href="#messages">訊息流程</a><a href="#architecture">架構</a><a href="#security">安全</a></div>
+</article>
+
+<!-- ============ MESSAGES ============ -->
+<article id="p-messages" data-title="訊息流程" hidden>
+  <div class="crumb">WIKI / 核心概念 / 訊息流程</div>
+  <h1>一次互動的訊息流程</h1>
+  <p class="lede">用官方文件裡的「天氣工具」例子，看 Client 和 Server 實際交換了什麼。</p>
+  <div class="meta"><span class="chip v">步驟 1 適用 ≤ 2025-11-25；2026-07-28 已改，見版本頁</span></div>
+
+  <h2>1. 建立連線（舊版：initialize 握手）</h2>
+  <p>在 2025-06-18 等版本中，Client 先送 <code>initialize</code>，雙方交換協定版本與各自支援的能力，之後 Client 送 <code>notifications/initialized</code> 表示準備好了。<a class="ref" href="#sources">S2</a> 在 2026-07-28 版本中，這個握手已被移除，改成每個請求自己帶版本與能力資訊。<a class="ref" href="#sources">S3</a></p>
+
+  <h2>2. 探索工具：tools/list</h2>
+  <p>Client 問 Server 有哪些工具。Server 回傳一份清單，每個工具有 <code>name</code>、<code>title</code>、<code>description</code>，以及用 JSON Schema 描述參數的 <code>inputSchema</code>。<a class="ref" href="#sources">S2</a></p>
+  <pre>{ "jsonrpc": "2.0", "id": 2, "method": "tools/list" }</pre>
+
+  <h2>3. 呼叫工具：tools/call</h2>
+  <p>模型決定要用某個工具時，Host 攔下這個呼叫，轉給對應的 Server 執行，再把結果放回對話給模型參考。<a class="ref" href="#sources">S2</a></p>
+  <pre>{
+  "jsonrpc": "2.0", "id": 3, "method": "tools/call",
+  "params": { "name": "weather_current",
+              "arguments": { "location": "San Francisco" } }
+}</pre>
+  <p>回應的 <code>content</code> 是一個陣列，可以放文字、圖片等不同型態的內容。<a class="ref" href="#sources">S2</a></p>
+
+  <h2>4. 主動通知：notifications/tools/list_changed</h2>
+  <p>工具清單改變時，Server 可以主動通知 Client。通知沒有 <code>id</code>，也不需要回覆；Client 收到後通常會重新呼叫 <code>tools/list</code>。<a class="ref" href="#sources">S2</a></p>
+  <div class="related">相關頁面：<a href="#primitives">原語</a><a href="#versions">規格版本</a><a href="#glossary">名詞表（JSON-RPC）</a></div>
+</article>
+
+<!-- ============ TRANSPORT ============ -->
+<article id="p-transport" data-title="傳輸層" hidden>
+  <div class="crumb">WIKI / 核心概念 / 傳輸層</div>
+  <h1>傳輸層：stdio 與 Streamable HTTP</h1>
+  <p class="lede">同樣的 JSON-RPC 訊息，可以走兩種不同的「管線」送過去。</p>
+  <div class="tbl"><table>
+    <tr><th></th><th>stdio</th><th>Streamable HTTP</th></tr>
+    <tr><td>位置</td><td>同一台電腦上的兩個程式</td><td>透過網路連到遠端</td></tr>
+    <tr><td>方式</td><td>用標準輸入／輸出串流直接溝通</td><td>用 HTTP POST 送訊息，可選擇用 Server-Sent Events 串流</td></tr>
+    <tr><td>常見稱呼</td><td>本機（local）Server</td><td>遠端（remote）Server</td></tr>
+    <tr><td>服務對象</td><td>通常只服務一個 Client</td><td>通常同時服務多個 Client</td></tr>
+    <tr><td>例子</td><td>Claude Desktop 啟動的檔案系統 Server</td><td>Sentry 官方的 MCP Server</td></tr>
+  </table></div>
+  <p>來源：<a class="ref" href="#sources">S2</a></p>
+  <h2>授權</h2>
+  <p>遠端傳輸支援 bearer token、API key 等標準 HTTP 驗證方式，官方建議用 OAuth 取得權杖。<a class="ref" href="#sources">S2</a> 2026-07-28 版本也加入了驗證授權回應中 issuer 參數的要求，用來防範 OAuth 混淆攻擊。<a class="ref" href="#sources">S8</a></p>
+  <div class="note">剛發布時 MCP 只能連本機 Server，遠端 Server 與企業級驗證當時仍在開發中，之後才推出。<a class="ref" href="#sources">S5</a> <a class="ref" href="#sources">S3</a></div>
+  <div class="related">相關頁面：<a href="#architecture">架構</a><a href="#versions">規格版本</a><a href="#security">安全</a></div>
+</article>
+
+<!-- ============ VERSIONS ============ -->
+<article id="p-versions" data-title="規格版本" hidden>
+  <div class="crumb">WIKI / 核心概念 / 規格版本</div>
+  <h1>規格版本與無狀態化</h1>
+  <p class="lede">MCP 規格用「發布日期」當版本名稱，所以讀資料時一定要看它講的是哪一版。</p>
+  <div class="tbl"><table>
+    <tr><th>版本</th><th>重點</th></tr>
+    <tr><td style="font-family:var(--f-mono)">2025-06-18</td><td>官方架構教學採用的版本：連線以 initialize 握手開始。<a class="ref" href="#sources">S2</a></td></tr>
+    <tr><td style="font-family:var(--f-mono)">2025-11-25</td><td>2025 年 11 月的版本。<a class="ref" href="#sources">S3</a></td></tr>
+    <tr><td style="font-family:var(--f-mono)">2026-07-28</td><td>目前最新版。核心改為無狀態：移除 initialize/initialized 握手與 <code>Mcp-Session-Id</code> 標頭，每個請求自帶版本、Client 身分與能力資訊。<a class="ref" href="#sources">S3</a></td></tr>
+  </table></div>
+
+  <h2>「無狀態」對初學者的意義</h2>
+  <p>以前的 MCP 像打電話：要先接通、互相確認聽得到，之後的對話都在同一通電話裡。2026-07-28 版本比較像寄信：每封信自己寫清楚寄件人和格式，任何一台伺服器收到都能處理。官方說，請求因此可以交給一般的輪替式負載平衡器分配，不需要共享的連線狀態儲存。<a class="ref" href="#sources">S3</a></p>
+  <p>The Register 的報導提到，這版也加入了功能生命週期與棄用政策，讓企業能預期規格變動的時程。<a class="ref" href="#sources">S8</a></p>
+  <div class="note warn"><b>讀資料時的陷阱：</b>網路上大多數 2025 年的教學都還在講 initialize 握手。那些內容在舊版是對的，但不代表最新規格。本 Wiki 在受影響的頁面都標了版本。</div>
+  <div class="related">相關頁面：<a href="#messages">訊息流程</a><a href="#history">發展歷程</a><a href="#log">建置日誌</a></div>
+</article>
+
+<!-- ============ VS FUNCTION CALLING ============ -->
+<article id="p-vs-function-calling" data-title="MCP 與 Function Calling" hidden>
+  <div class="crumb">WIKI / 比較與實務 / vs Function Calling</div>
+  <h1>MCP 與 Function Calling</h1>
+  <p class="lede">兩者是上下層的關係，不是二選一。</p>
+  <div class="tbl"><table>
+    <tr><th></th><th>Function Calling（工具使用）</th><th>MCP</th></tr>
+    <tr><td>層級</td><td>模型層的能力：模型選擇工具並填好參數</td><td>連接層的標準：規定 Host 怎麼找到並呼叫外部工具</td></tr>
+    <tr><td>範圍</td><td>一個模型呼叫一個應用裡定義好的工具</td><td>許多應用共用許多工具與資料來源</td></tr>
+    <tr><td>格式</td><td>各家模型廠商的格式不同</td><td>一套共同協定</td></tr>
+    <tr><td>適合</td><td>單一應用、少數工具、兩端都由你控制</td><td>很多 Client 需要同一組工具</td></tr>
+  </table></div>
+  <p>來源：<a class="ref" href="#sources">S6</a></p>
+  <h2>關係怎麼記</h2>
+  <p>MCP 底層仍然使用 function calling：MCP 的 tools 原語會對應到模型原生的工具呼叫介面。可以想成 function calling 決定「模型怎麼按下按鈕」，MCP 決定「按鈕的插頭長什麼樣」。<a class="ref" href="#sources">S6</a></p>
+  <h2>什麼時候不需要 MCP</h2>
+  <p>如果只有一個應用、一個模型、兩三個內部工具，直接用 function calling 通常更簡單。之後若需要讓別的應用重用，把原本的函式包進 MCP Server 即可，函式本體不必重寫。<a class="ref" href="#sources">S6</a></p>
+  <div class="related">相關頁面：<a href="#problem">M×N 問題</a><a href="#primitives">原語</a></div>
+</article>
+
+<!-- ============ SECURITY ============ -->
+<article id="p-security" data-title="安全風險與防護" hidden>
+  <div class="crumb">WIKI / 比較與實務 / 安全</div>
+  <h1>安全風險與防護</h1>
+  <p class="lede">MCP 讓模型能「做事」，所以被騙的代價也從說錯話變成做錯事。</p>
+  <h2>三種常見風險</h2>
+  <div class="tbl"><table>
+    <tr><th>風險</th><th>怎麼發生</th></tr>
+    <tr><td><b>間接提示注入</b></td><td>工具讀回來的內容（網頁、工單、郵件、檔案）夾帶指令，模型把它當成要照做的命令。<a class="ref" href="#sources">S7</a></td></tr>
+    <tr><td><b>工具投毒</b></td><td>惡意指令藏在 Server 提供的工具描述、參數說明或錯誤訊息等中繼資料裡，而模型本來就被設計成相信這些描述。<a class="ref" href="#sources">S7</a></td></tr>
+    <tr><td><b>Rug pull（中途變臉）</b></td><td>Server 一開始正常，取得信任後更新成惡意版本。<a class="ref" href="#sources">S7</a></td></tr>
+  </table></div>
+  <h2>防護習慣</h2>
+  <ul>
+    <li><b>把工具的輸入輸出都當成不可信資料</b>，不要讓模型自動照著讀到的內容行動。<a class="ref" href="#sources">S7</a></li>
+    <li><b>寫入、寄送、付款、刪除等動作要人工確認</b>，工具有變動時重新確認。<a class="ref" href="#sources">S7</a></li>
+    <li><b>固定 Server 版本並比對工具描述</b>，更新時檢查差異；第三方 Server 要先審查再啟用。<a class="ref" href="#sources">S7</a></li>
+  </ul>
+  <div class="note"><b>重點：</b>授權機制（OAuth）只保護「誰能連」，擋不住工具投毒或間接注入；MCP 部署是否安全，主要看 Host、Server 與企業管控怎麼設定。<a class="ref" href="#sources">S7</a></div>
+  <div class="related">相關頁面：<a href="#primitives">原語</a><a href="#transport">傳輸層（授權）</a></div>
+</article>
+
+<!-- ============ HISTORY ============ -->
+<article id="p-history" data-title="發展歷程與治理" hidden>
+  <div class="crumb">WIKI / 比較與實務 / 發展歷程</div>
+  <h1>發展歷程與治理</h1>
+  <div class="tbl"><table>
+    <tr><th>時間</th><th>事件</th></tr>
+    <tr><td style="font-family:var(--f-mono)">2024-11-25</td><td>Anthropic 開源 MCP，同時釋出規格與 SDK、Claude Desktop 的本機 Server 支援，以及開源的 Server 範例庫（Google Drive、Slack、GitHub、Git、Postgres、Puppeteer）。創造者是 David Soria Parra 與 Justin Spahr-Summers。<a class="ref" href="#sources">S1</a></td></tr>
+    <tr><td style="font-family:var(--f-mono)">2024-11</td><td>首批 SDK 為 TypeScript 與 Python；Block、Apollo 已整合，Zed、Replit、Codeium、Sourcegraph 等開發工具公司投入支援。<a class="ref" href="#sources">S1</a> <a class="ref" href="#sources">S5</a></td></tr>
+    <tr><td style="font-family:var(--f-mono)">2025-12-09</td><td>Anthropic 把 MCP 捐給 Linux 基金會旗下新成立的 Agentic AI Foundation（AAIF），與 Block 的 goose、OpenAI 的 AGENTS.md 並列創始專案。AAIF 由 Anthropic、Block、OpenAI 共同創立，Google、Microsoft、AWS、Cloudflare、Bloomberg 支持。<a class="ref" href="#sources">S4</a></td></tr>
+    <tr><td style="font-family:var(--f-mono)">2026-07-28</td><td>發布無狀態核心的新規格。官方部落格表示，各 Tier 1 SDK 每月下載量接近 5 億，TypeScript 與 Python SDK 累計都超過 10 億次。<a class="ref" href="#sources">S3</a></td></tr>
+  </table></div>
+  <h2>為什麼捐給基金會很重要</h2>
+  <p>Anthropic 表示捐贈是為了讓 MCP 保持開源、社群驅動且不偏向任何廠商。<a class="ref" href="#sources">S4</a> 對企業來說，協定不再由單一公司掌控，長期採用的風險較低。</p>
+  <div class="note warn"><b>查證紀錄：</b>有一篇第三方網站文章把捐贈日期寫成 2026 年 5 月，與 Anthropic 及 MCP 官方部落格的 2025-12-09 不符，本 Wiki 採用官方日期。詳見 <a href="#log">建置日誌</a>。</div>
+  <div class="related">相關頁面：<a href="#versions">規格版本</a><a href="#what-is">MCP 是什麼</a></div>
+</article>
+
+<!-- ============ GLOSSARY ============ -->
+<article id="p-glossary" data-title="名詞表" hidden>
+  <div class="crumb">WIKI / 參考 / 名詞表</div>
+  <h1>名詞表</h1>
+  <div class="tbl"><table>
+    <tr><th>名詞</th><th>白話解釋</th></tr>
+    <tr><td>LLM</td><td>大型語言模型，會讀寫文字的 AI 模型。</td></tr>
+    <tr><td>上下文（Context）</td><td>模型回答前能參考的所有資訊。</td></tr>
+    <tr><td>協定（Protocol）</td><td>雙方事先約好的溝通格式與規則。</td></tr>
+    <tr><td>Host</td><td>使用者操作的 AI 應用，例如 Claude Desktop、VS Code。</td></tr>
+    <tr><td>Client</td><td>Host 裡負責和一個 Server 連線的元件。</td></tr>
+    <tr><td>Server</td><td>提供工具、資源或提示範本的程式，可在本機或遠端。</td></tr>
+    <tr><td>原語（Primitive）</td><td>協定中定義好、可以交換的基本單位，如 tools、resources、prompts。</td></tr>
+    <tr><td>JSON-RPC 2.0</td><td>一種用 JSON 寫「請對方執行某個方法」的訊息格式；有 id 的是請求，沒有 id 的是通知。</td></tr>
+    <tr><td>JSON Schema</td><td>描述 JSON 資料該長什麼樣（哪些欄位、什麼型別）的規格。</td></tr>
+    <tr><td>stdio</td><td>標準輸入／輸出，同一台電腦上的程式互傳文字的管道。</td></tr>
+    <tr><td>Streamable HTTP</td><td>MCP 的遠端傳輸方式，用 HTTP POST 送訊息。</td></tr>
+    <tr><td>OAuth</td><td>常見的授權標準，讓應用在不拿到你密碼的情況下取得權限。</td></tr>
+    <tr><td>Function Calling</td><td>模型挑選工具並產生呼叫參數的能力，也稱 tool use。</td></tr>
+    <tr><td>提示注入</td><td>把惡意指令藏在模型會讀到的內容裡，讓模型照做。</td></tr>
+    <tr><td>工具投毒</td><td>把惡意指令藏在工具描述等中繼資料裡的攻擊。</td></tr>
+    <tr><td>AAIF</td><td>Agentic AI Foundation，Linux 基金會下管理 MCP 的組織。</td></tr>
+  </table></div>
+</article>
+
+<!-- ============ SOURCES ============ -->
+<article id="p-sources" data-title="來源清單" hidden>
+  <div class="crumb">WIKI / 參考 / 來源清單</div>
+  <h1>來源清單（Ingest 紀錄）</h1>
+  <p class="lede">共 ingest 8 份來源。可信度分三級：A 官方（Anthropic、MCP 官方網站與部落格）、B 主流科技媒體與資安機構、C 技術部落格（只用來補充比喻與實務建議，不作為日期與版本依據）。</p>
+  <div class="tbl"><table>
+    <tr><th>編號</th><th>來源</th><th>級</th><th>用在哪些頁</th></tr>
+    <tr><td>S1</td><td><a href="https://www.anthropic.com/news/model-context-protocol">Anthropic：Introducing the Model Context Protocol</a>（2024-11-25）</td><td>A</td><td>是什麼、問題、版本、歷程</td></tr>
+    <tr><td>S2</td><td><a href="https://modelcontextprotocol.io/docs/2025-06-18/learn/architecture">MCP 官方文件：Architecture overview</a>（規格 2025-06-18 版）</td><td>A</td><td>架構、原語、訊息流程、傳輸層</td></tr>
+    <tr><td>S3</td><td><a href="https://blog.modelcontextprotocol.io/posts/2026-07-28/">MCP 官方部落格：2026-07-28 規格發布</a></td><td>A</td><td>規格版本、訊息流程、歷程</td></tr>
+    <tr><td>S4</td><td><a href="https://blog.modelcontextprotocol.io/posts/2025-12-09-mcp-joins-agentic-ai-foundation/">MCP 官方部落格：MCP joins the Agentic AI Foundation</a>（2025-12-09），對照 <a href="https://www.anthropic.com/news/donating-the-model-context-protocol-and-establishing-of-the-agentic-ai-foundation">Anthropic 捐贈公告</a></td><td>A</td><td>歷程與治理</td></tr>
+    <tr><td>S5</td><td><a href="https://www.infoworld.com/article/3613143/anthropic-introduces-the-model-context-protocol.html">InfoWorld：Anthropic introduces the Model Context Protocol</a>（2024-11-26）</td><td>B</td><td>是什麼、傳輸層、歷程</td></tr>
+    <tr><td>S6</td><td><a href="https://inventivehq.com/blog/what-is-model-context-protocol">Inventive HQ：What Is the Model Context Protocol</a>；<a href="https://memx.app/blog/mcp-vs-function-calling/">memx：MCP vs Function Calling</a>；<a href="https://hackernoon.com/mcp-explained-one-protocol-for-all-your-ai-applications">HackerNoon：MCP Explained</a>；<a href="https://theaiengineer.substack.com/p/what-is-mcp">The AI Engineer：What is MCP?</a></td><td>C</td><td>USB-C 比喻、M×N、vs Function Calling</td></tr>
+    <tr><td>S7</td><td><a href="https://labs.cloudsecurityalliance.org/research-rb/csa-whitepaper-mcp-security-agentic-attack-surface-20260516/">Cloud Security Alliance：MCP Security 白皮書</a>（2026-05）；<a href="https://inventivehq.com/blog/mcp-security-risks">Inventive HQ：MCP Security Risks</a>；<a href="https://checkmarx.com/learn/mcp-security-risks-real-world-incidents-and-security-controls/">Checkmarx：MCP Security</a></td><td>B/C</td><td>安全</td></tr>
+    <tr><td>S8</td><td><a href="https://www.theregister.com/a/5280027">The Register：MCP 2026-07-28 規格報導</a></td><td>B</td><td>規格版本、傳輸層</td></tr>
+  </table></div>
+  <h2>讀過但沒有採用</h2>
+  <ul>
+    <li>一篇第三方整理網站（businesstechnavigator.com）的捐贈報導：日期與官方不符，不採用。</li>
+    <li>搜尋結果中 Anthropic 新聞頁夾帶的「相關文章」區塊：與 MCP 無關的側欄內容，ingest 時濾掉。</li>
+  </ul>
+</article>
+
+<!-- ============ LOG ============ -->
+<article id="p-log" data-title="Wiki 建置日誌" hidden>
+  <div class="crumb">WIKI / 參考 / 建置日誌</div>
+  <h1>Wiki 建置日誌</h1>
+  <p class="lede">依時間順序記錄這次實際執行的每一步，包含檢查發現的問題與修正。</p>
+  <ol class="log">
+    <li><time>討論 1</time><div><span class="tag ok">決定</span>主題：MCP。理由：比 AI Agents 新、和同學重複率低，又有完整官方文件可查。</div></li>
+    <li><time>討論 2</time><div><span class="tag ok">決定</span>資料由 AI 上網蒐集，至少 5 份，每份標可信度等級；成果做成網頁版 Wiki。</div></li>
+    <li><time>討論 3</time><div><span class="tag ok">決定</span>讀者設定為「沒碰過 MCP 的大學生」，先規劃 13 頁的頁面清單與每頁的任務，再開始寫。</div></li>
+    <li><time>取得 #1</time><div><span class="tag add">ingest</span>S1 Anthropic 發布文。<span class="tag fix">清理</span>搜尋結果混入同頁側欄的其他新聞，只保留 MCP 段落。</div></li>
+    <li><time>取得 #2</time><div><span class="tag add">ingest</span>S2 官方架構文件（全文抓取）。萃取角色、兩層、原語、訊息範例。</div></li>
+    <li><time>取得 #3</time><div><span class="tag add">ingest</span>S4 捐贈公告與 S5 InfoWorld。<span class="tag fix">衝突</span>第三方網站寫 2026-05-19 捐贈，官方與多家媒體為 2025-12-09。採官方日期，該來源列入「未採用」。</div></li>
+    <li><time>取得 #4</time><div><span class="tag add">ingest</span>S6 比較文章、S7 資安資料。只用來補比喻與防護建議，不拿來當日期或版本依據。</div></li>
+    <li><time>寫入</time><div><span class="tag ok">完成</span>依 S1、S2 寫出初稿，包含「連線一定以 initialize 握手開始」的敘述。</div></li>
+    <li><time>檢查</time><div><span class="tag fix">版本漂移</span>交叉比對時發現 S2 是 2025-06-18 版，而 S3/S8 指出 2026-07-28 已移除握手。初稿的說法對最新版不成立。</div></li>
+    <li><time>回頭取得</time><div><span class="tag add">ingest</span>補抓 S3 官方部落格與 S8 報導，新增「規格版本」頁，並在「訊息流程」頁加上版本標籤。</div></li>
+    <li><time>規則更新</time><div><span class="tag ok">流程</span>之後每條萃取出的事實都要記「來源日期＋適用規格版本」，在寫入 Wiki 前就檢查，而不是寫完才查。</div></li>
+    <li><time>最終檢查</time><div><span class="tag ok">通過</span>每頁事實句皆有來源編號；日期與版本皆由 A 級來源確認；名詞表涵蓋簡報會用到的術語。</div></li>
+  </ol>
+</article>
+
+</main>
+</div>
+
+<script>
+(function(){
+  var pages = Array.prototype.slice.call(document.querySelectorAll('article[id^="p-"]'));
+  var links = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+  var side = document.getElementById('side'), btn = document.getElementById('menuBtn');
+  function show(){
+    var key = (location.hash || '#home').slice(1);
+    var target = document.getElementById('p-' + key) || document.getElementById('p-home');
+    pages.forEach(function(p){ p.hidden = (p !== target); });
+    links.forEach(function(a){
+      if (a.getAttribute('href') === '#' + target.id.slice(2)) a.setAttribute('aria-current','page');
+      else a.removeAttribute('aria-current');
+    });
+    document.title = target.dataset.title === '首頁與頁面地圖' ? 'MCP 學習 Wiki' : target.dataset.title + ' · MCP 學習 Wiki';
+    side.classList.remove('open'); btn.setAttribute('aria-expanded','false');
+    window.scrollTo(0,0);
+  }
+  btn.addEventListener('click', function(){
+    var open = side.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  window.addEventListener('hashchange', show);
+  show();
+})();
+</script>
